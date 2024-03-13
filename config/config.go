@@ -1097,112 +1097,7 @@ oss:
 }
 
 func GenConsulInterfaceConfig(name string, port string, direct bool) string {
-	if name != "gateway" {
-		return fmt.Sprintf(`
-system:
-  environment: "prod" # dev、prod
-  ssl: false # 是否启用ssl true的话不会使用port
-  avatar_file_path: "/.cache/"
-  avatar_file_path_dev:
-  gateway_address: "43.229.28.107"
-  gateway_port: 8080
-  gateway_address_dev: "127.0.0.1"
-  gateway_port_dev: 8080
-
-log:
-  stdout: true
-  level: -1
-  file: "logs/app.log"
-  format: "console" # console、json
-
-email:
-  enable: false
-  smtp_server: "smtp.gmail.com"
-  port: 25
-  username: ""
-  password: ""
-
-livekit:
-  address: http://43.229.28.107
-  port: 7880
-  url: wss://coss.gezi.vip
-  api_key: APIbsEc4M9ceob3
-  secret_key: Op5frnZoFRUlG0lnCUhlh12I1XfdrB90ZEji07fXQZbB
-  timeout: 2m
-
-cache:
-  enable: true
-
-http:
-  address: "%s"
-  port: %s
-
-grpc:
-  address: "0.0.0.0"
-  port:
-
-# 注册本服务
-register:
-  # 服务注册名称
-  name: "%s"
-  # 注册中心地址
-  address: "consul"
-  # 注册中心端口
-  port: 8500
-  tags: ["%s", "bff", "%s interface"]
-  # 启用服务发现 默认为true
-  #discover: true
-  # 启用服务注册 默认为true
-  #register: true
-
-discovers:
-  user:
-    name: "user_service"
-    address: "user_service"
-    port: 10002
-    # 不使用服务发现，使用addr直接连接
-    # 默认为false
-    direct: %t
-  relation:
-    name: "relation_service"
-    address: "relation_service"
-    port: 10001
-    direct: %t
-  storage:
-    name: "storage_service"
-    address: "storage_service"
-    port: 10006
-    direct: %t
-  gateway:
-    name: "gateway"
-    address: "gateway"
-    port: 8080
-    direct: %t
-  msg:
-    name: "msg_service"
-    address: "msg_service"
-    port: 10000
-    direct: %t
-  group:
-    name: "group_service"
-    address: "group_service"
-    port: 10005
-    direct: %t
-
-
-encryption:
-  enabled: false
-  name: coss-im
-  email: max.mustermann@example.com
-  passphrase: LongSecret
-  rsaBits: 2048
-
-multiple_device_limit:
-  enable: false
-  max: 1
-`, name, port, name, name, name, direct, direct, direct, direct, direct, direct)
-	} else {
-		return fmt.Sprintf(`
+	return fmt.Sprintf(`
 system:
   environment: "prod" # dev、prod
   ssl: false # 是否启用ssl true的话不会使用port
@@ -1287,6 +1182,7 @@ discovers:
     address: "group_service"
     port: 10005
     direct: %t
+
 
 encryption:
   enabled: false
@@ -1299,7 +1195,7 @@ multiple_device_limit:
   enable: false
   max: 1
 `, name, port, name, name, name, direct, direct, direct, direct, direct)
-	}
+
 }
 
 func GenConsulServiceConfig(name string, port string) string {
