@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"coss-cli/pkg/consul"
 	"fmt"
+	"github.com/cossim/coss-cli/pkg/consul"
 	"github.com/urfave/cli/v2"
 )
 

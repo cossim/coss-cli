@@ -2,8 +2,8 @@ package consul
 
 import (
 	"bytes"
-	"coss-cli/utils/file"
 	"fmt"
+	"github.com/cossim/coss-cli/utils/file"
 	"io/ioutil"
 	"net/http"
 	"strings"

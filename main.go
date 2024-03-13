@@ -1,7 +1,7 @@
 package main
 
 import (
-	"coss-cli/cmd"
+	"github.com/cossim/coss-cli/cmd"
 	"log"
 	"os"
 )

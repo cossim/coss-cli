@@ -1,4 +1,4 @@
-module coss-cli
+module github.com/cossim/coss-cli
 
 go 1.22.0
 
