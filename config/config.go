@@ -69,8 +69,6 @@ func GenInterfaceConfig(name string, port string, direct bool) string {
 system:
   environment: "prod" # dev、prod
   ssl: false # 是否启用ssl true的话不会使用port
-  avatar_file_path: "/.cache/"
-  avatar_file_path_dev:
   gateway_address: "43.229.28.107"
   gateway_port: 8080
   gateway_address_dev: "127.0.0.1"
@@ -1101,8 +1099,6 @@ func GenConsulInterfaceConfig(name string, port string, direct bool) string {
 system:
   environment: "prod" # dev、prod
   ssl: false # 是否启用ssl true的话不会使用port
-  avatar_file_path: "/.cache/"
-  avatar_file_path_dev:
   gateway_address: "43.229.28.107"
   gateway_port: 8080
   gateway_address_dev: "127.0.0.1"
