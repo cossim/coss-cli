@@ -3,12 +3,14 @@ package cmd
 import (
 	"fmt"
 	"github.com/cossim/coss-cli/config"
+	"github.com/cossim/coss-cli/pkg/apisix"
 	"github.com/cossim/coss-cli/pkg/consul"
 	"github.com/cossim/coss-cli/pkg/pgp"
 	"github.com/urfave/cli/v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var App = &cli.App{
@@ -20,9 +22,10 @@ var App = &cli.App{
 			Usage: "init consul config",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:  "path",
-					Value: "",
-					Usage: "config path",
+					Name:    "path",
+					Value:   "",
+					Aliases: []string{"p"},
+					Usage:   "config path (multiple paths separated by commas)",
 				},
 				&cli.StringFlag{
 					Name:    "namespace",
@@ -50,16 +53,24 @@ var App = &cli.App{
 				if cCtx.String("path") == "" {
 					return fmt.Errorf("path is empty")
 				}
-				path := cCtx.String("path")
+				paths := strings.Split(cCtx.String("path"), ",")
+				if len(paths) == 0 {
+					return fmt.Errorf("no paths provided")
+				}
 				nameSpace := cCtx.String("namespace")
 				host := cCtx.String("host")
 				token := cCtx.String("token")
 				ssl := cCtx.Bool("ssl")
-				client := consul.NewConsulClient(host, nameSpace, path, token, ssl)
-				err := client.PutConfig()
-				if err != nil {
-					return err
+				client := consul.NewConsulClient(host, nameSpace, "", token, ssl)
+
+				for _, path := range paths {
+					client.SetPath(path)
+					err := client.PutConfig()
+					if err != nil {
+						return err
+					}
 				}
+
 				return nil
 			},
 		},
@@ -68,9 +79,10 @@ var App = &cli.App{
 			Usage: "gen coss config",
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
-					Name:  "direct",
-					Value: true,
-					Usage: "true or false",
+					Name:    "direct",
+					Value:   true,
+					Usage:   "true or false: --direct=false or -d=false",
+					Aliases: []string{"d"},
 				},
 				&cli.StringFlag{
 					Name:  "path",
@@ -82,14 +94,7 @@ var App = &cli.App{
 				direct := cCtx.Bool("direct")
 				outputDir := cCtx.String("path")
 				cacheDir := "./config"
-				if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
-					err := os.Mkdir(cacheDir, 0755) // 创建文件夹并设置权限
-					if err != nil {
-						return err
-					}
-				}
 
-				cacheDir = "./config/interface"
 				if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
 					err := os.Mkdir(cacheDir, 0755) // 创建文件夹并设置权限
 					if err != nil {
@@ -114,10 +119,16 @@ var App = &cli.App{
 				}
 
 				if direct {
-					// 生成接口配置文件
-					for _, name := range config.InterfaceList {
-						configStr := config.GenInterfaceConfig(name, config.InetrfaceConfig[name], direct)
-						filePath := filepath.Join(outputDir+"/config/interface/", fmt.Sprintf("%s.yaml", config.InetrfaceName[name]))
+					// 生成服务配置文件
+					for _, name := range config.ServiceList {
+
+						httpname := config.HttpName[name]
+						grpcname := config.GrpcName[name]
+						httpport := config.HttpPort[httpname]
+						grpcport := config.GrpcPort[grpcname]
+
+						configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport)
+						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 						if err != nil {
 							fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -126,35 +137,19 @@ var App = &cli.App{
 						}
 					}
 
-					// 生成服务配置文件
-					for _, name := range config.ServiceList {
-						configStr := config.GenServiceConfig(name, config.ServiceConfig[name])
-						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", config.ServiceName[name]))
-						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
-						if err != nil {
-							fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
-						} else {
-							fmt.Printf("生成 %s 成功\n", filePath)
-						}
-					}
 				} else {
 					fmt.Println("生成 consul 配置文件")
-					// 生成接口配置文件
-					for _, name := range config.InterfaceList {
-						configStr := config.GenConsulInterfaceConfig(name, config.InetrfaceConfig[name], direct)
-						filePath := filepath.Join(outputDir+"/config/interface/", fmt.Sprintf("%s.yaml", config.InetrfaceName[name]))
-						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
-						if err != nil {
-							fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
-						} else {
-							fmt.Printf("生成 %s 成功\n", filePath)
-						}
-					}
 
 					// 生成服务配置文件
 					for _, name := range config.ServiceList {
-						configStr := config.GenConsulServiceConfig(name, config.ServiceConfig[name])
-						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", config.ServiceName[name]))
+
+						httpname := config.HttpName[name]
+						grpcname := config.GrpcName[name]
+						httpport := config.HttpPort[httpname]
+						grpcport := config.GrpcPort[grpcname]
+
+						configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport)
+						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 						if err != nil {
 							fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -179,6 +174,7 @@ var App = &cli.App{
 				// 生成公共配置文件
 				for _, name := range config.CommonClist {
 					configStr := config.GenCommonConfig(name)
+
 					if name == "consul" {
 						filePath := filepath.Join(outputDir+"/config/common/", fmt.Sprintf("%s.json", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
@@ -187,6 +183,7 @@ var App = &cli.App{
 						} else {
 							fmt.Printf("生成 %s 成功\n", filePath)
 						}
+
 					} else {
 						filePath := filepath.Join(outputDir+"/config/common/", fmt.Sprintf("%s.yaml", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
@@ -206,7 +203,9 @@ var App = &cli.App{
 				} else {
 					configStr = config.GenDockerCompose(true)
 				}
+
 				filePath := filepath.Join(outputDir, "docker-compose.yaml")
+
 				err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 				if err != nil {
 					fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -221,6 +220,52 @@ var App = &cli.App{
 					return err
 				}
 
+				return nil
+			},
+		},
+		{
+			Name:  "route",
+			Usage: "init gateway route",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:    "direct",
+					Value:   true,
+					Usage:   "true or false: --direct=false or -d=false",
+					Aliases: []string{"d"},
+				},
+				&cli.StringFlag{
+					Name:  "key",
+					Value: "edd1c9f034335f136f87ad84b625c8f1",
+					Usage: "apisix api key ",
+				},
+				&cli.StringFlag{
+					Name:  "host",
+					Value: "http://127.0.0.1:9180",
+					Usage: "apisix host",
+				},
+			},
+			Action: func(context *cli.Context) error {
+				apiKey := context.String("key")
+				host := context.String("host")
+				direct := context.Bool("direct")
+
+				baseURL := host + "/apisix/admin/routes/"
+
+				client := apisix.NewApiClient(apiKey, baseURL)
+
+				route := apisix.Routes
+				if !direct {
+					route = apisix.ConsulRoutes
+				}
+
+				for i, route := range route {
+					resp, err := client.SendRequest("PUT", fmt.Sprintf("%d", i+1), route)
+					if err != nil {
+						fmt.Printf("Error sending request for route %d: %v\n", i+1, err)
+						continue
+					}
+					fmt.Printf("Route %d created successfully: %s\n", i+1, resp)
+				}
 				return nil
 			},
 		},
