@@ -14,7 +14,6 @@ type ConsulClient struct {
 	path      string
 	namespace string
 	token     string
-	ssl       bool
 }
 
 var opt = map[string]string{
@@ -22,14 +21,9 @@ var opt = map[string]string{
 	"acl": "/acl",
 }
 
-func NewConsulClient(host string, namespace string, path string, token string, ssl bool) *ConsulClient {
+func NewConsulClient(host string, namespace string, path string, token string) *ConsulClient {
 	host = host + "/v1"
-	if ssl {
-		host = "https://" + host
-	} else {
-		host = "http://" + host
-	}
-	return &ConsulClient{host: host, namespace: namespace, path: path, token: token, ssl: ssl}
+	return &ConsulClient{host: host, namespace: namespace, path: path, token: token}
 }
 
 func (c *ConsulClient) PutConfig() error {

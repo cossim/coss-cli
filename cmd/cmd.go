@@ -35,7 +35,7 @@ var App = &cli.App{
 				},
 				&cli.StringFlag{
 					Name:  "host",
-					Value: "127.0.0.1:8500",
+					Value: "http://127.0.0.1:8500",
 					Usage: "consul host",
 				},
 				&cli.StringFlag{
@@ -60,8 +60,8 @@ var App = &cli.App{
 				nameSpace := cCtx.String("namespace")
 				host := cCtx.String("host")
 				token := cCtx.String("token")
-				ssl := cCtx.Bool("ssl")
-				client := consul.NewConsulClient(host, nameSpace, "", token, ssl)
+				token = token + "/"
+				client := consul.NewConsulClient(host, nameSpace, "", token)
 
 				for _, path := range paths {
 					client.SetPath(path)
@@ -243,20 +243,23 @@ var App = &cli.App{
 					Value: "http://127.0.0.1:9180",
 					Usage: "apisix host",
 				},
+				&cli.StringFlag{
+					Name:  "domain",
+					Value: "",
+					Usage: "route domain name",
+				},
 			},
 			Action: func(context *cli.Context) error {
 				apiKey := context.String("key")
 				host := context.String("host")
 				direct := context.Bool("direct")
+				domain := context.String("domain")
 
 				baseURL := host + "/apisix/admin/routes/"
 
 				client := apisix.NewApiClient(apiKey, baseURL)
 
-				route := apisix.Routes
-				if !direct {
-					route = apisix.ConsulRoutes
-				}
+				route := client.GetRoutes(domain, direct)
 
 				for i, route := range route {
 					resp, err := client.SendRequest("PUT", fmt.Sprintf("%d", i+1), route)
@@ -265,6 +268,65 @@ var App = &cli.App{
 						continue
 					}
 					fmt.Printf("Route %d created successfully: %s\n", i+1, resp)
+				}
+				return nil
+			},
+		},
+		{
+			Name:  "ssl",
+			Usage: "init consul config",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "cert",
+					Value: "./",
+					Usage: "cert file path",
+				},
+				&cli.StringFlag{
+					Name:  "private_key",
+					Value: "./",
+					Usage: "key file path",
+				},
+				&cli.StringFlag{
+					Name:  "domain",
+					Value: "",
+					Usage: "your domain name",
+				},
+				&cli.StringFlag{
+					Name:  "key",
+					Value: "edd1c9f034335f136f87ad84b625c8f1",
+					Usage: "apisix api key ",
+				},
+				&cli.StringFlag{
+					Name:  "host",
+					Value: "http://127.0.0.1:9180",
+					Usage: "apisix host",
+				},
+			},
+			Action: func(context *cli.Context) error {
+				certPath := context.String("cert")
+				keyPath := context.String("private_key")
+				domain := context.String("domain")
+				apiKey := context.String("key")
+				host := context.String("host")
+
+				cert, err := ioutil.ReadFile(certPath)
+				if err != nil {
+					return fmt.Errorf("failed to read certificate file: %v", err)
+				}
+
+				key, err := ioutil.ReadFile(keyPath)
+				if err != nil {
+					return fmt.Errorf("failed to read key file: %v", err)
+				}
+
+				if domain == "" {
+					return fmt.Errorf("domain name is required")
+				}
+				client := apisix.NewApiClient(apiKey, host)
+				if err := client.UpdateSSL(cert, key, []string{domain}); err != nil {
+					fmt.Printf("Error updating SSL: %v\n", err)
+				} else {
+					fmt.Printf("SSL updated successfully\n")
 				}
 				return nil
 			},

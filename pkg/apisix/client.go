@@ -2,29 +2,26 @@ package apisix
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/cossim/coss-cli/config"
 	"io/ioutil"
 	"net/http"
 	"sync"
 )
 
-var ConsulRoutes = []string{
-	`{"uri": "/api/v1/user/*", "upstream": {"service_name": "user_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/group/*", "upstream": {"service_name": "group_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/relation/*", "upstream": {"service_name": "relation_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/admin/*", "upstream": {"service_name": "admin_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/msg/*", "upstream": {"service_name": "msg_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/storage/*", "upstream": {"service_name": "storage_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/msg/ws", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "msg_bff", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
+var RouteName = []string{
+	"user",
+	"group",
+	"relation",
+	"admin",
+	"msg",
+	"storage",
+	"live",
 }
 
-var Routes = []string{
-	`{"uri": "/api/v1/user/*", "upstream": {"type": "roundrobin", "nodes": {"user:8083": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/group/*", "upstream": {"type": "roundrobin", "nodes": {"group:8084": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/relation/*", "upstream": {"type": "roundrobin", "nodes": {"relation:8082": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/admin/*", "upstream": {"type": "roundrobin", "nodes": {"admin:8087": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/msg/*", "upstream": {"type": "roundrobin", "nodes": {"msg:8081": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/storage/*", "upstream": {"type": "roundrobin", "nodes": {"storage:8085": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
-	`{"uri": "/api/v1/msg/ws", "name": "ws", "enable_websocket": true, "upstream": {"type": "roundrobin", "nodes": {"msg:8081": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`,
+var WsRouteName = []string{
+	"ws",
 }
 
 // ApiService 定义单例结构体
@@ -56,6 +53,32 @@ func NewApiClient(apiKey, baseURL string) *ApiClient {
 	return &ApiClient{apiService: apiServiceInstance}
 }
 
+func (c *ApiClient) GetRoute(uri string, node string, domain string, serviceName string, ws bool) string {
+	if domain == "" {
+		if ws {
+			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
+		}
+		return fmt.Sprintf(`{"uri": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
+	}
+	if ws {
+		return fmt.Sprintf(`{"uri": "%s", "host": "%s","name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
+	}
+	return fmt.Sprintf(`{"uri": "%s","host": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
+}
+
+func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string, ws bool) string {
+	if domain == "" {
+		if ws {
+			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+		}
+		return fmt.Sprintf(`{"uri": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+	}
+	if ws {
+		return fmt.Sprintf(`{"uri": "%s","host": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+	}
+	return fmt.Sprintf(`{"uri": "%s", "host": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+}
+
 // SendRequest 发送请求
 func (c *ApiClient) SendRequest(method, endpoint, payload string) ([]byte, error) {
 	url := c.apiService.baseURL + endpoint
@@ -78,4 +101,49 @@ func (c *ApiClient) SendRequest(method, endpoint, payload string) ([]byte, error
 	}
 
 	return body, nil
+}
+
+// UpdateSSL 更新SSL证书
+func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string) error {
+	payload := map[string]interface{}{
+		"cert": string(cert),
+		"key":  string(key),
+		"snis": snis,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.SendRequest("PUT", "/apisix/admin/ssls/1", string(jsonPayload))
+	return err
+}
+
+func (c *ApiClient) GetRoutes(domain string, direct bool) []string {
+	var routes []string
+	for _, v := range RouteName {
+		uri := fmt.Sprintf("/api/v1/%s/*", v)
+		if !direct {
+			routes = append(routes, c.GetConsulRoute(uri, domain, config.HttpName[v], false))
+			continue
+		}
+		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", v, config.HttpPort[config.HttpName[v]]), domain, v, false))
+	}
+	for _, s := range WsRouteName {
+		uri := ""
+		serviceName := ""
+		switch s {
+		case "ws":
+			serviceName = "msg"
+			uri = fmt.Sprintf("/api/v1/msg/%s", s)
+		}
+		if !direct {
+			routes = append(routes, c.GetConsulRoute(uri, domain, config.HttpName[serviceName], true))
+			continue
+		}
+		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", serviceName, config.HttpPort[config.HttpName[serviceName]]), domain, serviceName, true))
+	}
+
+	return routes
 }
