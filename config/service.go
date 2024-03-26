@@ -140,8 +140,8 @@ oss:
 func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string) string {
 	return fmt.Sprintf(`
 system:
-  environment: "dev" # dev、prod
-  ssl: false # 是否启用ssl true的话不会使用port
+  environment: "prod" # dev、prod
+  ssl: true # 是否启用ssl true的话不会使用port
   gateway_address: "tuo.gezi.vip"
   gateway_port: 8080
   gateway_address_dev: "127.0.0.1"
