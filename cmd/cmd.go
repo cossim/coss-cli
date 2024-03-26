@@ -89,10 +89,28 @@ var App = &cli.App{
 					Value: "./",
 					Usage: "config path",
 				},
+				&cli.StringFlag{
+					Name:  "env",
+					Value: "prod",
+					Usage: "dev or prod",
+				},
+				&cli.StringFlag{
+					Name:  "domain",
+					Value: "tuo.gezi.vip",
+					Usage: "your domain name",
+				},
+				&cli.BoolFlag{
+					Name:  "ssl",
+					Value: false,
+					Usage: "consul enable ssl",
+				},
 			},
 			Action: func(cCtx *cli.Context) error {
 				direct := cCtx.Bool("direct")
 				outputDir := cCtx.String("path")
+				env := cCtx.String("env")
+				domain := cCtx.String("domain")
+				enableSsl := cCtx.Bool("ssl")
 				cacheDir := "./config"
 
 				if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
@@ -127,7 +145,7 @@ var App = &cli.App{
 						httpport := config.HttpPort[httpname]
 						grpcport := config.GrpcPort[grpcname]
 
-						configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport)
+						configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport, env, enableSsl, domain)
 						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 						if err != nil {
@@ -148,7 +166,7 @@ var App = &cli.App{
 						httpport := config.HttpPort[httpname]
 						grpcport := config.GrpcPort[grpcname]
 
-						configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport)
+						configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport, env, enableSsl, domain)
 						filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 						err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 						if err != nil {

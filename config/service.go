@@ -2,13 +2,13 @@ package config
 
 import "fmt"
 
-func GenServiceConfig(httpName string, grpcName string, httpPort string, grpcPort string) string {
+func GenServiceConfig(httpName string, grpcName string, httpPort string, grpcPort string, env string, enableSsl bool, domain string) string {
 	return fmt.Sprintf(`
 system:
-  environment: "dev" # dev、prod
-  ssl: false # 是否启用ssl true的话不会使用port
-  gateway_address: ""
-  gateway_port: 
+  environment: "%s" # dev、prod
+  ssl: %t # 是否启用ssl true的话不会使用port
+  gateway_address: "%s"
+  gateway_port: 8080
   gateway_address_dev: "127.0.0.1"
   gateway_port_dev: 8080
 
@@ -134,15 +134,15 @@ oss:
   presignedExpires: ""
   dial: "3000ms"
   timeout: "5000ms"
-`, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
+`, env, enableSsl, domain, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
 }
 
-func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string) string {
+func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string, env string, enableSsl bool, domain string) string {
 	return fmt.Sprintf(`
 system:
-  environment: "prod" # dev、prod
-  ssl: true # 是否启用ssl true的话不会使用port
-  gateway_address: "tuo.gezi.vip"
+  environment: "%s" # dev、prod
+  ssl: %t # 是否启用ssl true的话不会使用port
+  gateway_address: "%s"
   gateway_port: 8080
   gateway_address_dev: "127.0.0.1"
   gateway_port_dev: 8080
@@ -209,5 +209,5 @@ encryption:
 multiple_device_limit:
   enable: false
   max: 1
-`, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
+`, env, enableSsl, domain, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
 }
