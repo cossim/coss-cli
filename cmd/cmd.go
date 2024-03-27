@@ -101,7 +101,7 @@ var App = &cli.App{
 				},
 				&cli.BoolFlag{
 					Name:  "ssl",
-					Value: false,
+					Value: true,
 					Usage: "consul enable ssl",
 				},
 			},

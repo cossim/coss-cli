@@ -160,6 +160,13 @@ email:
   username: ""
   password: ""
 
+livekit:
+ address: http://103.63.139.136
+ port: 7880
+ url: wss://tuo.gezi.vip
+ api_key: APIbsEc4M9ceob3
+ secret_key: Op5frnZoFRUlG0lnCUhlh12I1XfdrB90ZEji07fXQZbB
+ timeout: 2m
 
 cache:
   enable: true
