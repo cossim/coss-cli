@@ -20,6 +20,18 @@ services:
       - etcd
     ports:
       - "8000:9000/tcp"
+  livekit:
+    image: livekit/livekit-server
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    volumes:
+       - ./config/common/livekit.yaml:/livekit.yaml
+    command:
+      - "--config"
+      - "/livekit.yaml"
+      - "--node-ip=127.0.0.1"
   apisix:
     image: apache/apisix
     container_name: cossim_apisix
@@ -281,6 +293,18 @@ services:
       - etcd
     ports:
       - "8000:9000/tcp"
+  livekit:
+    image: livekit/livekit-server
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    volumes:
+       - ./config/common/livekit.yaml:/livekit.yaml
+    command:
+      - "--config"
+      - "/livekit.yaml"
+      - "--node-ip=127.0.0.1"
   apisix:
     image: apache/apisix
     container_name: cossim_apisix
