@@ -90,9 +90,11 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
     "enable_websocket": true,
     "upstream": {
         "type": "roundrobin",
-        "nodes": {
-            "livekit": 1
-        }
+        "nodes": [{
+			"host": "livekit",
+        	"port": 7880,
+        	"weight": 1
+        }]
     },
     "plugins": {
         "limit-count": {
@@ -113,9 +115,11 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
     "enable_websocket": true,
     "upstream": {
         "type": "roundrobin",
-        "nodes": {
-            "livekit": 1
-        }
+        "nodes": [{
+			"host": "livekit",
+        	"port": 7880,
+        	"weight": 1
+        }]
     },
     "plugins": {
         "limit-count": {
@@ -193,6 +197,7 @@ func (c *ApiClient) GetRoutes(domain string, livekitDomain string, direct bool) 
 			uri = fmt.Sprintf("/api/v1/msg/%s", s)
 		case "livekit":
 			route := c.GetLiveKitRoute(livekitDomain)
+			fmt.Printf("生成livekit路由=>", route)
 			routes = append(routes, route)
 			continue
 		}
