@@ -22,6 +22,7 @@ services:
       - "8000:9000/tcp"
   livekit:
     image: livekit/livekit-server
+    container_name: cossim_livekit
     ports:
       - "7880:7880"
       - "7881:7881"
@@ -295,6 +296,7 @@ services:
       - "8000:9000/tcp"
   livekit:
     image: livekit/livekit-server
+    container_name: cossim_livekit
     ports:
       - "7880:7880"
       - "7881:7881"
