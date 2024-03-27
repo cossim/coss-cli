@@ -104,6 +104,35 @@ authentication:
     - username: user
       password: user
 `)
+	case LiveKit:
+		return fmt.Sprintf(`
+port: 7880
+rtc:
+  udp_port: 7882
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 60000
+  # use_external_ip should be set to true for most cloud environments where
+  # the host has a public IP address, but is not exposed to the process.
+  # LiveKit will attempt to use STUN to discover the true IP, and advertise
+  # that IP with its clients
+  use_external_ip: true
+  enable_loopback_candidate: false
+keys:
+  APIbsEc4M9ceob3: 
+logging:
+  json: false
+  level: info
+room:
+ auto_create: true
+
+turn:
+ enabled: true
+ tls_port: 443
+ domain: 
+ cert_file: 
+ key_file: 
+`)
 	}
 	return ""
 }

@@ -266,18 +266,24 @@ var App = &cli.App{
 					Value: "",
 					Usage: "route domain name",
 				},
+				&cli.StringFlag{
+					Name:  "livekit",
+					Value: "",
+					Usage: "livekit domain name",
+				},
 			},
 			Action: func(context *cli.Context) error {
 				apiKey := context.String("key")
 				host := context.String("host")
 				direct := context.Bool("direct")
 				domain := context.String("domain")
+				livekitDomain := context.String("livekit")
 
 				baseURL := host + "/apisix/admin/routes/"
 
 				client := apisix.NewApiClient(apiKey, baseURL)
 
-				route := client.GetRoutes(domain, direct)
+				route := client.GetRoutes(domain, livekitDomain, direct)
 
 				for i, route := range route {
 					resp, err := client.SendRequest("PUT", fmt.Sprintf("%d", i+1), route)

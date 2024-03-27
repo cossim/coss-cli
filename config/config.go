@@ -7,6 +7,7 @@ const (
 	HIPUSH                            = "hipush"
 	APISIX                            = "apisix"
 	APISIX_DASHBOARD                  = "apisix-dashboard"
+	LiveKit                           = "livekit"
 )
 
 var CommonClist = []CommonClientType{
@@ -14,6 +15,7 @@ var CommonClist = []CommonClientType{
 	HIPUSH,
 	APISIX,
 	APISIX_DASHBOARD,
+	LiveKit,
 }
 
 type ConsulCommon string

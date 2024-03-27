@@ -22,6 +22,7 @@ var RouteName = []string{
 
 var WsRouteName = []string{
 	"ws",
+	"livekit",
 }
 
 // ApiService 定义单例结构体
@@ -79,6 +80,59 @@ func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string
 	return fmt.Sprintf(`{"uri": "%s", "host": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
 }
 
+func (c *ApiClient) GetLiveKitRoute(domain string) string {
+	route := ""
+	if domain != "" {
+		route = fmt.Sprintf(`{
+    "uri": "/",
+    "name": "livekit",
+    "host": "%s",
+    "enable_websocket": true,
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "livekit": 1
+        }
+    },
+    "plugins": {
+        "limit-count": {
+            "count": 5,
+            "time_window": 10,
+            "rejected_code": 503,
+            "_meta": {
+                "disable": true
+            }
+        },
+        "cors": {}
+    }
+}`, domain)
+	} else {
+		route = fmt.Sprintf(`{
+    "uri": "/",
+    "name": "livekit",
+    "enable_websocket": true,
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "livekit": 1
+        }
+    },
+    "plugins": {
+        "limit-count": {
+            "count": 5,
+            "time_window": 10,
+            "rejected_code": 503,
+            "_meta": {
+                "disable": true
+            }
+        },
+        "cors": {}
+    }
+}`)
+	}
+	return route
+}
+
 // SendRequest 发送请求
 func (c *ApiClient) SendRequest(method, endpoint, payload string) ([]byte, error) {
 	url := c.apiService.baseURL + endpoint
@@ -120,7 +174,7 @@ func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string) error {
 	return err
 }
 
-func (c *ApiClient) GetRoutes(domain string, direct bool) []string {
+func (c *ApiClient) GetRoutes(domain string, livekitDomain string, direct bool) []string {
 	var routes []string
 	for _, v := range RouteName {
 		uri := fmt.Sprintf("/api/v1/%s/*", v)
@@ -137,6 +191,10 @@ func (c *ApiClient) GetRoutes(domain string, direct bool) []string {
 		case "ws":
 			serviceName = "msg"
 			uri = fmt.Sprintf("/api/v1/msg/%s", s)
+		case "livekit":
+			route := c.GetLiveKitRoute(livekitDomain)
+			routes = append(routes, route)
+			continue
 		}
 		if !direct {
 			routes = append(routes, c.GetConsulRoute(uri, domain, config.HttpName[serviceName], true))
