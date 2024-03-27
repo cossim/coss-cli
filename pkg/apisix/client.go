@@ -84,7 +84,7 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
 	route := ""
 	if domain != "" {
 		route = fmt.Sprintf(`{
-    "uri": "/",
+    "uri": "/*",
     "name": "livekit",
     "host": "%s",
     "enable_websocket": true,
@@ -110,7 +110,7 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
 }`, domain)
 	} else {
 		route = fmt.Sprintf(`{
-    "uri": "/",
+    "uri": "/*",
     "name": "livekit",
     "enable_websocket": true,
     "upstream": {
