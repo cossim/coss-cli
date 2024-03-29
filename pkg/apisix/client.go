@@ -274,7 +274,7 @@ func (c *ApiClient) SendRequest(method, endpoint, payload string) ([]byte, error
 }
 
 // UpdateSSL 更新SSL证书
-func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string) error {
+func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string, num int) error {
 	payload := map[string]interface{}{
 		"cert": string(cert),
 		"key":  string(key),
@@ -286,7 +286,7 @@ func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string) error {
 		return err
 	}
 
-	_, err = c.SendRequest("PUT", "/apisix/admin/ssls/1", string(jsonPayload))
+	_, err = c.SendRequest("PUT", fmt.Sprintf("/apisix/admin/ssls/%d", num), string(jsonPayload))
 	return err
 }
 

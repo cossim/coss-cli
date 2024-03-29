@@ -315,6 +315,11 @@ var App = &cli.App{
 					Value: "",
 					Usage: "your domain name",
 				},
+				&cli.IntFlag{
+					Name:  "num",
+					Value: 1,
+					Usage: "ssl key num",
+				},
 				&cli.StringFlag{
 					Name:  "key",
 					Value: "edd1c9f034335f136f87ad84b625c8f1",
@@ -332,6 +337,7 @@ var App = &cli.App{
 				domain := context.String("domain")
 				apiKey := context.String("key")
 				host := context.String("host")
+				num := context.Int("num")
 
 				cert, err := ioutil.ReadFile(certPath)
 				if err != nil {
@@ -347,7 +353,7 @@ var App = &cli.App{
 					return fmt.Errorf("domain name is required")
 				}
 				client := apisix.NewApiClient(apiKey, host)
-				if err := client.UpdateSSL(cert, key, []string{domain}); err != nil {
+				if err := client.UpdateSSL(cert, key, []string{domain}, num); err != nil {
 					fmt.Printf("Error updating SSL: %v\n", err)
 				} else {
 					fmt.Printf("SSL updated successfully\n")
