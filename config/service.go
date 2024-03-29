@@ -64,11 +64,11 @@ dtm:
   port: 36790
 
 http:
-  name: "%s"
+  name: "0.0.0.0"
   port: %s
 
 grpc:
-  name: "%s"
+  name: "0.0.0.0"
   port: %s
 
 # 注册本服务
@@ -134,7 +134,7 @@ oss:
   presignedExpires: ""
   dial: "3000ms"
   timeout: "5000ms"
-`, env, enableSsl, domain, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
+`, env, enableSsl, domain, httpPort, grpcPort, grpcName, grpcName)
 }
 
 func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string, env string, enableSsl bool, domain string) string {

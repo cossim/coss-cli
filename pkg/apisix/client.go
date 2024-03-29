@@ -57,27 +57,115 @@ func NewApiClient(apiKey, baseURL string) *ApiClient {
 func (c *ApiClient) GetRoute(uri string, node string, domain string, serviceName string, ws bool) string {
 	if domain == "" {
 		if ws {
-			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
+			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
 		}
-		return fmt.Sprintf(`{"uri": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
+		return fmt.Sprintf(`{"uri": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
 	}
 	if ws {
-		return fmt.Sprintf(`{"uri": "%s", "host": "%s","name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
+		return fmt.Sprintf(`{"uri": "%s", "host": "%s","name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
 	}
-	return fmt.Sprintf(`{"uri": "%s","host": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
+	return fmt.Sprintf(`{"uri": "%s","host": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
 }
 
 func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string, ws bool) string {
 	if domain == "" {
 		if ws {
-			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
 		}
-		return fmt.Sprintf(`{"uri": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+		return fmt.Sprintf(`{"uri": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
 	}
 	if ws {
-		return fmt.Sprintf(`{"uri": "%s","host": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+		return fmt.Sprintf(`{"uri": "%s","host": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
 	}
-	return fmt.Sprintf(`{"uri": "%s", "host": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+	return fmt.Sprintf(`{"uri": "%s", "host": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
 }
 
 func (c *ApiClient) GetLiveKitRoute(domain string) string {
@@ -97,6 +185,18 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
         }]
     },
     "plugins": {
+		"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },
         "limit-count": {
             "count": 5,
             "time_window": 10,
@@ -122,6 +222,18 @@ func (c *ApiClient) GetLiveKitRoute(domain string) string {
         }]
     },
     "plugins": {
+		"api-breaker": {
+            "break_response_code": 502,
+			"max_breaker_sec": 5,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        },
         "limit-count": {
             "count": 5,
             "time_window": 10,
