@@ -91,7 +91,7 @@ var App = &cli.App{
 				},
 				&cli.StringFlag{
 					Name:  "env",
-					Value: "prod",
+					Value: "dev",
 					Usage: "dev or prod",
 				},
 				&cli.StringFlag{
@@ -101,7 +101,7 @@ var App = &cli.App{
 				},
 				&cli.BoolFlag{
 					Name:  "ssl",
-					Value: true,
+					Value: false,
 					Usage: "consul enable ssl",
 				},
 			},

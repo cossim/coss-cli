@@ -105,6 +105,11 @@ discovers:
     address: "group"
     port: 10005
     direct: true
+  push:
+    name: "push_service"
+    address: "push"
+    port: 10007
+    direct: true
 
 message_queue:
   name: "rabbitmq"

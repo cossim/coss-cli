@@ -40,6 +40,7 @@ var ServiceList = []string{
 	"storage",
 	"live",
 	"admin",
+	"push",
 }
 
 var HttpPort = map[string]string{
@@ -50,6 +51,7 @@ var HttpPort = map[string]string{
 	"user_bff":     "8083",
 	"msg_bff":      "8081",
 	"storage_bff":  "8085",
+	"push_bff":     "8090",
 }
 
 var HttpName = map[string]string{
@@ -60,6 +62,7 @@ var HttpName = map[string]string{
 	"user":     "user_bff",
 	"msg":      "msg_bff",
 	"storage":  "storage_bff",
+	"push":     "push_bff",
 }
 
 var GrpcName = map[string]string{
@@ -68,6 +71,7 @@ var GrpcName = map[string]string{
 	"user":     "user_service",
 	"msg":      "msg_service",
 	"storage":  "storage_service",
+	"push":     "push_service",
 }
 
 var GrpcPort = map[string]string{
@@ -76,4 +80,5 @@ var GrpcPort = map[string]string{
 	"user_service":     "10002",
 	"msg_service":      "10000",
 	"storage_service":  "10006",
+	"push_service":     "10007",
 }

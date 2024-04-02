@@ -148,7 +148,7 @@ services:
       - '8600:8600'
       - '8600:8600/udp'
   hipush:
-    container_name: cossim_push
+    container_name: cossim_hipush
     image: hub.hitosea.com/cossim/hipush
     volumes:
       - ./config/common/hipush.yaml:/config/config.yaml
@@ -277,6 +277,19 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    environment:
+      CONSUL_HTTP_TOKEN:
+    restart: on-failure
+  push:
+    container_name: cossim_push
+    image: hub.hitosea.com/cossim/push
+    command:
+      - "--config"
+      - "/config/config.yaml"
+      - "--discover"
+    volumes:
+      - ./config/service/push.yaml:/config/config.yaml
+      - ./config/pgp:/.cache
     environment:
       CONSUL_HTTP_TOKEN:
     restart: on-failure
@@ -422,7 +435,7 @@ services:
       - '8600:8600'
       - '8600:8600/udp'
   hipush:
-    container_name: cossim_push
+    container_name: cossim_hipush
     image: hub.hitosea.com/cossim/hipush
     volumes:
       - ./config/common/hipush.yaml:/config/config.yaml
@@ -558,6 +571,20 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    environment:
+      CONSUL_HTTP_TOKEN:
+    restart: on-failure
+  push:
+    container_name: cossim_push
+    image: hub.hitosea.com/cossim/push
+    command:
+      - "--discover"
+      - "--register"
+      - "--remote-config"
+      - "--config-center-addr"
+      - "consul:8500"
+    volumes:
+      - ./config/pgp:/.cache
     environment:
       CONSUL_HTTP_TOKEN:
     restart: on-failure

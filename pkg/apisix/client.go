@@ -305,8 +305,8 @@ func (c *ApiClient) GetRoutes(domain string, livekitDomain string, direct bool) 
 		serviceName := ""
 		switch s {
 		case "ws":
-			serviceName = "msg"
-			uri = fmt.Sprintf("/api/v1/msg/%s", s)
+			serviceName = "push"
+			uri = fmt.Sprintf("/api/v1/%s/%s", serviceName, s)
 		case "livekit":
 			route := c.GetLiveKitRoute(livekitDomain)
 			fmt.Printf("生成livekit路由=>", route)
