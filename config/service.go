@@ -210,6 +210,10 @@ discovers:
     name: "storage_service"
     port: 10006
     direct: false
+  push:
+    name: "push_service"
+    port: 10007
+    direct: true
 
 encryption:
   enabled: false
