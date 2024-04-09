@@ -455,8 +455,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     depends_on:
@@ -477,8 +486,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     depends_on:
@@ -496,8 +514,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     depends_on:
       mysql:
         condition: service_healthy
@@ -513,8 +540,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     depends_on:
@@ -530,8 +566,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     depends_on:
@@ -547,8 +592,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     depends_on:
       mysql:
         condition: service_healthy
@@ -564,8 +618,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     depends_on:
@@ -581,8 +644,17 @@ services:
       - "--discover"
       - "--register"
       - "--remote-config"
+      - "--hot-reload"
       - "--config-center-addr"
       - "consul:8500"
+      - "--pprof-bind-address"
+      - ":6060"
+      - "--metrics-bind-address"
+      - ":9090"
+      - "--http-health-probe-bind-address"
+      - ":9091"
+      - "--grpc-health-probe-bind-address"
+      - ":9092"
     volumes:
       - ./config/pgp:/.cache
     environment:
