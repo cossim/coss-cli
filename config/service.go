@@ -213,7 +213,7 @@ discovers:
   push:
     name: "push_service"
     port: 10007
-    direct: true
+    direct: false
 
 encryption:
   enabled: false
