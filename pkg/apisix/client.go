@@ -54,67 +54,17 @@ func NewApiClient(apiKey, baseURL string) *ApiClient {
 	return &ApiClient{apiService: apiServiceInstance}
 }
 
-func (c *ApiClient) GetRoute(uri string, node string, domain string, serviceName string, ws bool) string {
-	if domain == "" {
-		if ws {
-			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
-            "break_response_code": 502,
-			"max_breaker_sec": 5,
-            "unhealthy": {
-                "http_statuses": [500, 503],
-                "failures": 3
-            },
-            "healthy": {
-                "http_statuses": [200],
-                "successes": 1
-            }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
-		}
-		return fmt.Sprintf(`{"uri": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
-            "break_response_code": 502,
-			"max_breaker_sec": 5,
-            "unhealthy": {
-                "http_statuses": [500, 503],
-                "failures": 3
-            },
-            "healthy": {
-                "http_statuses": [200],
-                "successes": 1
-            }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, node)
+func getUpstream(node string, direct bool) string {
+	if !direct {
+		return fmt.Sprintf(`{"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}`, node)
 	}
-	if ws {
-		return fmt.Sprintf(`{"uri": "%s", "host": "%s","name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
-            "break_response_code": 502,
-			"max_breaker_sec": 5,
-            "unhealthy": {
-                "http_statuses": [500, 503],
-                "failures": 3
-            },
-            "healthy": {
-                "http_statuses": [200],
-                "successes": 1
-            }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
-	}
-	return fmt.Sprintf(`{"uri": "%s","host": "%s", "upstream": {"type": "roundrobin", "nodes": {"%s": 1}}, "plugins": {"api-breaker": {
-            "break_response_code": 502,
-			"max_breaker_sec": 5,
-            "unhealthy": {
-                "http_statuses": [500, 503],
-                "failures": 3
-            },
-            "healthy": {
-                "http_statuses": [200],
-                "successes": 1
-            }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, node)
+	return fmt.Sprintf(`{"type": "roundrobin", "nodes": {"%s": 1}}`, node)
 }
 
-func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string, ws bool) string {
+func (c *ApiClient) GetRoute(uri string, node string, domain string, serviceName string, ws bool, direct bool) string {
 	if domain == "" {
 		if ws {
-			return fmt.Sprintf(`{"uri": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+			return fmt.Sprintf(`{"uri": "%s", "name": "%s", "enable_websocket": true, "upstream": %s, "plugins": {"api-breaker": {
             "break_response_code": 502,
 			"max_breaker_sec": 5,
             "unhealthy": {
@@ -125,9 +75,9 @@ func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string
                 "http_statuses": [200],
                 "successes": 1
             }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName, getUpstream(node, direct))
 		}
-		return fmt.Sprintf(`{"uri": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+		return fmt.Sprintf(`{"uri": "%s",  "name": "%s","upstream": %s, "plugins": {"api-breaker": {
             "break_response_code": 502,
 			"max_breaker_sec": 5,
             "unhealthy": {
@@ -138,10 +88,10 @@ func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string
                 "http_statuses": [200],
                 "successes": 1
             }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName)
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName, getUpstream(node, direct))
 	}
 	if ws {
-		return fmt.Sprintf(`{"uri": "%s","host": "%s", "name": "ws", "enable_websocket": true, "upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+		return fmt.Sprintf(`{"uri": "%s",  "name": "%s","host": "%s", "enable_websocket": true, "upstream": %s, "plugins": {"api-breaker": {
             "break_response_code": 502,
 			"max_breaker_sec": 5,
             "unhealthy": {
@@ -152,9 +102,9 @@ func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string
                 "http_statuses": [200],
                 "successes": 1
             }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName, domain, getUpstream(node, direct))
 	}
-	return fmt.Sprintf(`{"uri": "%s", "host": "%s","upstream": {"service_name": "%s", "type": "roundrobin", "discovery_type": "consul"}, "plugins": {"api-breaker": {
+	return fmt.Sprintf(`{"uri": "%s", "name": "%s","host": "%s", "upstream": %s, "plugins": {"api-breaker": {
             "break_response_code": 502,
 			"max_breaker_sec": 5,
             "unhealthy": {
@@ -165,7 +115,7 @@ func (c *ApiClient) GetConsulRoute(uri string, domain string, serviceName string
                 "http_statuses": [200],
                 "successes": 1
             }
-        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, domain, serviceName)
+        },"limit-count": {"count": 5, "time_window": 10, "rejected_code": 503, "_meta": {"disable": true}}, "cors": {}}}`, uri, serviceName, domain, getUpstream(node, direct))
 }
 
 func (c *ApiClient) GetLiveKitRoute(domain string) string {
@@ -290,15 +240,20 @@ func (c *ApiClient) UpdateSSL(cert, key []byte, snis []string, num int) error {
 	return err
 }
 
-func (c *ApiClient) GetRoutes(domain string, livekitDomain string, direct bool) []string {
+func (c *ApiClient) GetRoutes(domain string, host, livekitDomain string, direct bool) []string {
 	var routes []string
+	rhost := ""
 	for _, v := range RouteName {
+		rhost = v
 		uri := fmt.Sprintf("/api/v1/%s/*", v)
 		if !direct {
-			routes = append(routes, c.GetConsulRoute(uri, domain, config.HttpName[v], false))
+			routes = append(routes, c.GetRoute(uri, config.HttpName[v], domain, v, false, direct))
 			continue
 		}
-		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", v, config.HttpPort[config.HttpName[v]]), domain, v, false))
+		if host != "" {
+			rhost = host
+		}
+		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", rhost, config.HttpPort[config.HttpName[v]]), domain, v, false, direct))
 	}
 	for _, s := range WsRouteName {
 		uri := ""
@@ -309,15 +264,18 @@ func (c *ApiClient) GetRoutes(domain string, livekitDomain string, direct bool) 
 			uri = fmt.Sprintf("/api/v1/%s/%s", serviceName, s)
 		case "livekit":
 			route := c.GetLiveKitRoute(livekitDomain)
-			fmt.Printf("生成livekit路由=>", route)
 			routes = append(routes, route)
 			continue
 		}
+		rhost = serviceName
 		if !direct {
-			routes = append(routes, c.GetConsulRoute(uri, domain, config.HttpName[serviceName], true))
+			routes = append(routes, c.GetRoute(uri, config.HttpName[serviceName], domain, serviceName, true, direct))
 			continue
 		}
-		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", serviceName, config.HttpPort[config.HttpName[serviceName]]), domain, serviceName, true))
+		if host != "" {
+			rhost = host
+		}
+		routes = append(routes, c.GetRoute(uri, fmt.Sprintf("%s:%s", rhost, config.HttpPort[config.HttpName[serviceName]]), domain, serviceName, true, direct))
 	}
 
 	return routes
