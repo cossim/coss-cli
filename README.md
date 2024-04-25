@@ -4,12 +4,10 @@ coss-cli 是一个用于快速部署cossim的命令行工具。
 
 ## 安装
 
-确保你的Go环境已经安装并设置好，然后执行以下命令安装 coss-cli：
+>可以在***mac/linux/windows***不同平台下执行的命令
+> 
+> ### 在这里下载工具 [coss-cli](https://github.com/cossim/coss-cli/releases/tag/v1.0.0)
 
-```bash
-go get github.com/cossim/coss-cli
-go install github.com/cossim/coss-cli
-```
 
 ## 快速使用
 ```bash
