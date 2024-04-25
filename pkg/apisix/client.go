@@ -245,7 +245,7 @@ func (c *ApiClient) GetRoutes(domain string, host, livekitDomain string, direct 
 	rhost := ""
 	for _, v := range RouteName {
 		rhost = v
-		uri := fmt.Sprintf("/api/v1/%s/*", v)
+		uri := fmt.Sprintf("/api/v1/%s*", v)
 		if !direct {
 			routes = append(routes, c.GetRoute(uri, config.HttpName[v], domain, v, false, direct))
 			continue
@@ -261,7 +261,7 @@ func (c *ApiClient) GetRoutes(domain string, host, livekitDomain string, direct 
 		switch s {
 		case "ws":
 			serviceName = "push"
-			uri = fmt.Sprintf("/api/v1/%s/%s", serviceName, s)
+			uri = fmt.Sprintf("/api/v1/%s*", serviceName)
 		case "livekit":
 			route := c.GetLiveKitRoute(livekitDomain)
 			routes = append(routes, route)

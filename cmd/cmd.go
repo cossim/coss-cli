@@ -13,9 +13,12 @@ import (
 	"strings"
 )
 
+const VERSION = "v1.0.0"
+
 var App = &cli.App{
-	Name:  "coss-cli",
-	Usage: "coss-cli is a command line tool for coss",
+	Name:    "coss-cli",
+	Usage:   "coss-cli is a command line tool for coss",
+	Version: VERSION,
 	Commands: []*cli.Command{
 		{
 			Name:  "config",
