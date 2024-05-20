@@ -1,4 +1,3 @@
-# Go 编译器
 GO := go
 
 # 项目名称
@@ -25,7 +24,7 @@ LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 # 构建目标
 .PHONY: build
 build:
-	@$(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(VERSION)$(EXT)
+	@$(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(GOOS)-$(GOARCH)-$(VERSION)$(EXT)
 
 # 打包目标
 .PHONY: package
