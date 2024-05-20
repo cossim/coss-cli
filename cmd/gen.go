@@ -10,10 +10,9 @@ import (
 	"path/filepath"
 )
 
-func genFile(cCtx *cli.Context) error {
+func gen(cCtx *cli.Context) error {
 	direct := cCtx.Bool("direct")
 	outputDir := cCtx.String("path")
-	env := cCtx.String("env")
 	domain := cCtx.String("domain")
 	enableSsl := cCtx.Bool("ssl")
 	cacheDir := "./config"
@@ -50,7 +49,7 @@ func genFile(cCtx *cli.Context) error {
 			httpport := config.HttpPort[httpname]
 			grpcport := config.GrpcPort[grpcname]
 
-			configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport, env, enableSsl, domain)
+			configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport, enableSsl, domain)
 			filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
@@ -71,7 +70,7 @@ func genFile(cCtx *cli.Context) error {
 			httpport := config.HttpPort[httpname]
 			grpcport := config.GrpcPort[grpcname]
 
-			configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport, env, enableSsl, domain)
+			configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport, enableSsl, domain)
 			filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {

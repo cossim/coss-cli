@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const VERSION = "v1.0.0"
+const VERSION = "v1.0.1"
 
 var App = &cli.App{
 	Name:    "coss-cli",
@@ -61,13 +61,8 @@ var App = &cli.App{
 					Usage: "config path",
 				},
 				&cli.StringFlag{
-					Name:  "env",
-					Value: "dev",
-					Usage: "dev or prod",
-				},
-				&cli.StringFlag{
 					Name:  "domain",
-					Value: "tuo.gezi.vip",
+					Value: "127.0.0.1",
 					Usage: "your domain name",
 				},
 				&cli.BoolFlag{
@@ -76,7 +71,7 @@ var App = &cli.App{
 					Usage: "consul enable ssl",
 				},
 			},
-			Action: genFile,
+			Action: gen,
 		},
 		{
 			Name:  "route",

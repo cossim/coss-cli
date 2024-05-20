@@ -5,7 +5,7 @@ GO := go
 APP_NAME := coss-cli
 
 # 版本号
-VERSION := 1.0.0
+VERSION := 1.0.1
 
 # 交叉编译目标平台
 PLATFORMS := linux windows darwin
@@ -25,7 +25,7 @@ LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 # 构建目标
 .PHONY: build
 build:
-	@$(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(GOOS)-$(GOARCH)-$(VERSION)$(EXT)
+	@$(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(VERSION)$(EXT)
 
 # 打包目标
 .PHONY: package

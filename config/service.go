@@ -2,15 +2,12 @@ package config
 
 import "fmt"
 
-func GenServiceConfig(httpName string, grpcName string, httpPort string, grpcPort string, env string, enableSsl bool, domain string) string {
+func GenServiceConfig(httpName string, grpcName string, httpPort string, grpcPort string, enableSsl bool, domain string) string {
 	return fmt.Sprintf(`
 system:
-  environment: "%s" # dev、prod
   ssl: %t # 是否启用ssl true的话不会使用port
   gateway_address: "%s"
   gateway_port: 8080
-  gateway_address_dev: "127.0.0.1"
-  gateway_port_dev: 8080
 
 log:
   stdout: true
@@ -139,18 +136,16 @@ oss:
   presignedExpires: ""
   dial: "3000ms"
   timeout: "5000ms"
-`, env, enableSsl, domain, httpPort, grpcPort, grpcName, grpcName)
+`, enableSsl, domain, httpPort, grpcPort, grpcName, grpcName)
 }
 
-func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string, env string, enableSsl bool, domain string) string {
+func GenConsulServiceConfig(httpName, grpcName, httpPort, grpcPort string, enableSsl bool, domain string) string {
 	return fmt.Sprintf(`
 system:
-  environment: "%s" # dev、prod
   ssl: %t # 是否启用ssl true的话不会使用port
   gateway_address: "%s"
   gateway_port: 8080
-  gateway_address_dev: "127.0.0.1"
-  gateway_port_dev: 8080
+  jwt_secret: "secret"
 
 log:
   stdout: true
@@ -225,5 +220,5 @@ encryption:
 multiple_device_limit:
   enable: false
   max: 1
-`, env, enableSsl, domain, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
+`, enableSsl, domain, httpName, httpPort, grpcName, grpcPort, grpcName, grpcName)
 }

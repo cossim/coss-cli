@@ -22,7 +22,7 @@ coss-cli gen --direct=false
 docker-compose up -d
 coss-cli config --path ./config/common --namespace common
 coss-cli config --path ./config/service --namespace service
-coss-cli route --direct=false --route-host=192.168.100.236
+coss-cli route --direct=false --route-host=<your-consul-host>
 ```
 >如果要指定consul地址，可以使用`--host`参数,默认为`http://127.0.0.1:8500`
 > 
