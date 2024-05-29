@@ -7,7 +7,6 @@ on:
 
 jobs:
   build-and-release:
-    needs: create_release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
