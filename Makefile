@@ -3,14 +3,14 @@ GO := go
 # 项目名称
 APP_NAME := coss-cli
 
-# 版本号 (默认值)
-VERSION := 1.0.1
+# 版本号 (可以通过环境变量传入)
+VERSION ?= 1.0.3
 
-# 交叉编译目标平台
-PLATFORMS := linux windows darwin
+# 交叉编译目标平台 (可以通过环境变量传入)
+PLATFORMS ?= linux windows darwin
 
-# 支持的架构
-ARCHS := amd64
+# 支持的架构 (可以通过环境变量传入)
+ARCHS ?= amd64
 
 # 构建目录
 BUILD_DIR := build
@@ -24,7 +24,8 @@ LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 # 构建目标
 .PHONY: build
 build:
-	@$(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(GOOS)-$(GOARCH)-$(VERSION)$(EXT)
+	@mkdir -p $(BUILD_DIR)
+	@GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME)-$(GOOS)-$(GOARCH)-$(VERSION)$(EXT)
 
 # 打包目标
 .PHONY: package
