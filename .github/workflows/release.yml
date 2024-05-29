@@ -31,10 +31,17 @@ jobs:
             echo "EXT=" >> $GITHUB_ENV
           fi
 
-      - name: Build and Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install GitHub CLI
         run: |
-          TAG=${GITHUB_REF/refs\/tags\//}
-          make build
-          gh release create "$TAG" build/*-${{ matrix.platform }}-${{ matrix.arch }}-$TAG --title "$TAG" --notes "Release version $TAG"
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
+
+      - name: Build and Release
+        env:
+          GO: go
+          VERSION: ${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make release VERSION=${{ github.ref_name }} TAG=${{ github.ref_name }}
