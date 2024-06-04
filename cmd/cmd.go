@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const VERSION = "v1.0.1"
+const VERSION = "v1.0.4"
 
 var App = &cli.App{
 	Name:    "coss-cli",

@@ -16,6 +16,9 @@ func gen(cCtx *cli.Context) error {
 	domain := cCtx.String("domain")
 	enableSsl := cCtx.Bool("ssl")
 	cacheDir := "./config"
+	if outputDir != "" {
+		cacheDir = outputDir + "/config"
+	}
 
 	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
 		err := os.Mkdir(cacheDir, 0755) // 创建文件夹并设置权限
