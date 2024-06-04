@@ -4,13 +4,13 @@ GO := go
 APP_NAME := coss-cli
 
 # 版本号 (可以通过环境变量传入)
-VERSION ?= 1.0.3
+VERSION ?= 1.0.4
 
 # 交叉编译目标平台 (可以通过环境变量传入)
 PLATFORMS ?= linux windows darwin
 
 # 支持的架构 (可以通过环境变量传入)
-ARCHS ?= amd64
+ARCHS ?= amd64 arm64
 
 # 构建目录
 BUILD_DIR := build

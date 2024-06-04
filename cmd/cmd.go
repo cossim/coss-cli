@@ -12,6 +12,24 @@ var App = &cli.App{
 	Version: VERSION,
 	Commands: []*cli.Command{
 		{
+			Name:  "start",
+			Usage: "start coss",
+			Flags: []cli.Flag{
+				//&cli.StringFlag{
+				//	Name:  "path",
+				//	Value: "./",
+				//	Usage: "config path",
+				//},
+				&cli.BoolFlag{
+					Name:    "direct",
+					Value:   true,
+					Usage:   "true or false: --direct=false or -d=false",
+					Aliases: []string{"d"},
+				},
+			},
+			Action: start,
+		},
+		{
 			Name:  "config",
 			Usage: "init consul config",
 			Flags: []cli.Flag{
