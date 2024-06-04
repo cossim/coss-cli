@@ -27,17 +27,17 @@ func gen(cCtx *cli.Context) error {
 		}
 	}
 
-	cacheDir = "./config/service"
-	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
-		err := os.Mkdir(cacheDir, 0755) // 创建文件夹并设置权限
+	serviceDir := cacheDir + "/service"
+	if _, err := os.Stat(serviceDir); os.IsNotExist(err) {
+		err := os.Mkdir(serviceDir, 0755) // 创建文件夹并设置权限
 		if err != nil {
 			return err
 		}
 	}
 
-	cacheDir = "./config/common"
-	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
-		err := os.Mkdir(cacheDir, 0755) // 创建文件夹并设置权限
+	commonDir := cacheDir + "/common"
+	if _, err := os.Stat(commonDir); os.IsNotExist(err) {
+		err := os.Mkdir(commonDir, 0755) // 创建文件夹并设置权限
 		if err != nil {
 			return err
 		}
@@ -53,7 +53,7 @@ func gen(cCtx *cli.Context) error {
 			grpcport := config.GrpcPort[grpcname]
 
 			configStr := config.GenServiceConfig(httpname, grpcname, httpport, grpcport, enableSsl, domain)
-			filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
+			filePath := filepath.Join(serviceDir, fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
 				fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -74,7 +74,7 @@ func gen(cCtx *cli.Context) error {
 			grpcport := config.GrpcPort[grpcname]
 
 			configStr := config.GenConsulServiceConfig(httpname, grpcname, httpport, grpcport, enableSsl, domain)
-			filePath := filepath.Join(outputDir+"/config/service/", fmt.Sprintf("%s.yaml", name))
+			filePath := filepath.Join(serviceDir, fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
 				fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -86,7 +86,7 @@ func gen(cCtx *cli.Context) error {
 		//生成公共配置
 		for _, name := range config.ConsulCommonList {
 			configStr := config.GenConsulCommonConfig(name)
-			filePath := filepath.Join(outputDir+"/config/common/", fmt.Sprintf("%s.yaml", name))
+			filePath := filepath.Join(commonDir, fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
 				fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -101,7 +101,7 @@ func gen(cCtx *cli.Context) error {
 		configStr := config.GenCommonConfig(name)
 
 		if name == "consul" {
-			filePath := filepath.Join(outputDir+"/config/common/", fmt.Sprintf("%s.json", name))
+			filePath := filepath.Join(commonDir, fmt.Sprintf("%s.json", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
 				fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
@@ -110,7 +110,7 @@ func gen(cCtx *cli.Context) error {
 			}
 
 		} else {
-			filePath := filepath.Join(outputDir+"/config/common/", fmt.Sprintf("%s.yaml", name))
+			filePath := filepath.Join(commonDir, fmt.Sprintf("%s.yaml", name))
 			err := ioutil.WriteFile(filePath, []byte(configStr), 0644)
 			if err != nil {
 				fmt.Printf("写入文件 %s 失败：%v\n", filePath, err)
