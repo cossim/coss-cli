@@ -7,7 +7,14 @@ coss-cli 是一个用于快速部署cossim的命令行工具。
 >可以在***mac/linux/windows***不同平台下执行的命令
 > 
 > ### 在这里下载工具 [coss-cli](https://github.com/cossim/coss-cli/releases)
-
+### 源码安装
+```
+git clone https://github.com/cossim/coss-cli
+cd coss-cli
+go mod tidy
+go install
+coss-cli --help
+```
 
 ## 快速使用
 ```bash
