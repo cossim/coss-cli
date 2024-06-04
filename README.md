@@ -21,11 +21,17 @@ coss-cli --help
 ```
 
 ## 快速使用
+```
+coss-cli start
+```
+或
 ```bash
 1.生成配置文件
 coss-cli gen
+
 2.启动容器
 docker-compose up -d
+
 3.注册路由
 coss-cli route
 ```
@@ -34,11 +40,14 @@ coss-cli route
 ```bash
 1.生成配置文件
 coss-cli gen --direct=false
+
 2.启动容器
 docker-compose up -d
+
 3.注册配置文件
 coss-cli config --path ./config/common --namespace common
 coss-cli config --path ./config/service --namespace service
+
 4.注册路由
 coss-cli route --direct=false --route-host=<your-consul-host>
 ```
@@ -51,22 +60,20 @@ coss-cli config --path ./config/common --namespace common --host=http://127.0.0.
 
 ## Help
 ```
-NAME:
-   coss-cli - coss-cli is a command line tool for coss
-
-USAGE:
-   coss-cli [global options] command [command options] 
-
+...
 COMMANDS:
-   config   init consul config 
-   gen      gen coss config 
-   route    init gateway route 
-   ssl      init consul config 
+   start    start coss
+   config   init consul config
+   gen      gen coss config
+   route    init gateway route
+   ssl      init consul config
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h  show help
+   --help, -h     show help
+   --version, -v  print the version
 
+...
 ```
 > config 用来初始化consul中的配置文件
 > 
