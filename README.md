@@ -11,17 +11,24 @@ coss-cli 是一个用于快速部署cossim的命令行工具。
 
 ## 快速使用
 ```bash
+1.生成配置文件
 coss-cli gen
+2.启动容器
 docker-compose up -d
+3.注册路由
 coss-cli route
 ```
 
 ## 使用注册中心
 ```bash
+1.生成配置文件
 coss-cli gen --direct=false
+2.启动容器
 docker-compose up -d
+3.注册配置文件
 coss-cli config --path ./config/common --namespace common
 coss-cli config --path ./config/service --namespace service
+4.注册路由
 coss-cli route --direct=false --route-host=<your-consul-host>
 ```
 >如果要指定consul地址，可以使用`--host`参数,默认为`http://127.0.0.1:8500`
